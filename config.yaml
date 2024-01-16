@@ -1,0 +1,306 @@
+cora:
+  num_layers: 1
+  hid_dim: 512
+  proj_dim: 512
+  drop_incidence_rate_1: 0.1
+  drop_incidence_rate_2: 0.2
+  drop_feature_rate_1: 0.1
+  drop_feature_rate_2: 0.2
+  tau: 0.5
+  tau_n: 0.5
+  tau_g: 0.5
+  tau_m: 1
+  w_g: 1.2
+  w_m: 0.18
+  n_epoch: 305
+  lr: 3.5e-04
+  weight_decay: 0.08
+  n_ratio : 0.45
+  e_ratio : 0.45
+  lr_lr: 0.005
+  lr_num_epochs: 50
+  lambda_n: 0.0002
+  lambda_g: 0.0035
+  beta: 0.62
+  K: 1
+  d: 10
+  device: 0
+  batch_size: 512
+  batch_size_1: null
+  batch_size_2: null
+
+citeseer:
+  num_layers: 1
+  hid_dim: 256
+  proj_dim: 256
+  drop_incidence_rate_1: 0.1
+  drop_incidence_rate_2: 0.2
+  drop_feature_rate_1: 0.1
+  drop_feature_rate_2: 0.2
+  tau: 0.35
+  tau_n: 0.5
+  tau_g: 0.5
+  tau_m: 1
+  w_g: 1
+  w_m: 0.18
+  n_epoch: 265
+  lr: 3.5e-04
+  weight_decay: 0.2
+  n_ratio : 0.45
+  e_ratio : 0.45
+  lr_lr: 0.005
+  lr_num_epochs: 60
+  lambda_n: 0.00002
+  lambda_g: 0.00075
+  beta: 0.65
+  K: 4
+  d: 10
+  device: 1
+  batch_size: 512
+  batch_size_1: null
+  batch_size_2: null
+
+pubmed:
+  num_layers: 1
+  hid_dim: 512
+  proj_dim: 512
+  drop_incidence_rate_1: 0.1
+  drop_incidence_rate_2: 0.2
+  drop_feature_rate_1: 0.1
+  drop_feature_rate_2: 0.2
+  tau: 0.5
+  tau_n: 0.5
+  tau_g: 0.5
+  tau_m: 1
+  w_g: 1
+  w_m: 0.1
+  n_epoch: 1000
+  lr: 3.55e-04
+  weight_decay: 4.5e-5
+  lr_lr: 0.03
+  lr_wd: 0.0
+  lr_num_epochs: 65
+  lambda_n: 0.0015
+  lambda_g: 0.0055
+  beta: 0.65
+  K: 2
+  d: 10
+  device: 0
+  batch_size: 512
+  batch_size_1: null
+  batch_size_2: null
+
+cora_coauthor:
+  num_layers: 1
+  hid_dim: 512
+  proj_dim: 512
+  drop_incidence_rate_1: 0.05
+  drop_incidence_rate_2: 0.1
+  drop_feature_rate_1: 0.05
+  drop_feature_rate_2: 0.1
+  tau: 0.5
+  tau_n: 0.5
+  tau_g: 0.5
+  tau_m: 1
+  w_g: 1
+  w_m: 0
+  n_epoch: 160
+  lr: 3.7e-04
+  weight_decay: 0.053
+  n_ratio : 0.45
+  e_ratio : 0.45
+  lr_lr: 0.005
+  lr_num_epochs: 78
+  lambda_n: 0.0003
+  lambda_g: 0.00001
+  beta: 0.65
+  K: 4
+  d: 10
+  device: 0
+  batch_size: 512
+  batch_size_1: null
+  batch_size_2: null
+
+dblp_coauthor:
+  num_layers: 2
+  hid_dim: 512
+  proj_dim: 512
+  drop_incidence_rate_1: 0.1
+  drop_incidence_rate_2: 0.2
+  drop_feature_rate_1: 0.1
+  drop_feature_rate_2: 0.2
+  tau: 0.5
+  tau_n: 0.5
+  tau_g: 0.5
+  tau_m: 1
+  w_g: 1
+  w_m: 0.18
+  n_epoch: 60
+  lr: 3.6e-04
+  weight_decay: 0.01
+  n_ratio : 0.45
+  e_ratio : 0.45
+  lr_lr: 0.015
+  lr_num_epochs: 350
+  lambda_n: 0.0012
+  lambda_g: 0.003
+  beta: 0.65
+  K: 3
+  d: 10
+  device: 0
+  batch_size: 64
+  batch_size_1: null
+  batch_size_2: null
+
+zoo:
+  num_layers: 1
+  hid_dim: 1024
+  proj_dim: 1024
+  drop_incidence_rate_1: 0.1
+  drop_incidence_rate_2: 0.2
+  drop_feature_rate_1: 0.1
+  drop_feature_rate_2: 0.2
+  tau: 0.6
+  tau_n: 0.5
+  tau_g: 0.5
+  tau_m: 1
+  w_g: 1
+  w_m: 0.205
+  n_epoch: 50
+  lr: 3.6e-04
+  weight_decay: 0.1
+  n_ratio : 0.45
+  e_ratio : 0.45
+  lr_lr: 0.018
+  lr_num_epochs: 80
+  lambda_n: 0.00002
+  lambda_g: 0.0018
+  beta: 0.65
+  K: 3
+  d: 10
+  device: 0
+  batch_size: 512
+  batch_size_1: null
+  batch_size_2: null
+
+20newsW100:
+  num_layers: 1
+  hid_dim: 512
+  proj_dim: 512
+  drop_incidence_rate_1: 0.05
+  drop_incidence_rate_2: 0.1
+  drop_feature_rate_1: 0.05
+  drop_feature_rate_2: 0.1
+  tau: 1
+  tau_n: 0.5
+  tau_g: 0.5
+  tau_m: 1
+  w_g: 1
+  w_m: 0.01
+  n_epoch: 50
+  lr: 3.0e-04
+  weight_decay: 0
+  lr_lr: 0.018
+  lr_num_epochs: 100
+  lambda_n: 0.0005
+  lambda_g: 0.0001
+  beta: 0.6
+  K: 1
+  d: 10
+  device: 1
+  batch_size: 512
+  batch_size_1: null
+  batch_size_2: null
+
+NTU2012:
+  num_layers: 1
+  hid_dim: 512
+  proj_dim: 512
+  drop_incidence_rate_1: 0.05
+  drop_incidence_rate_2: 0.1
+  drop_feature_rate_1: 0.05
+  drop_feature_rate_2: 0.1
+  tau: 0.5
+  tau_n: 0.5
+  tau_g: 0.5
+  tau_m: 1
+  w_g: 1
+  w_m: 0.18
+  n_epoch: 60
+  lr: 3.55e-04
+  weight_decay: 0.01
+  n_ratio : 0.45
+  e_ratio : 0.45
+  lr_lr: 0.0075
+  lr_num_epochs: 105
+  lambda_n: 0.0065
+  lambda_g: 0.00005
+  beta: 0.635
+  K: 2
+  d: 10
+  device: 1
+  batch_size: 512
+  batch_size_1: null
+  batch_size_2: null
+
+Mushroom:
+  num_layers: 1
+  hid_dim: 512
+  proj_dim: 512
+  drop_incidence_rate_1: 0.05
+  drop_incidence_rate_2: 0.1
+  drop_feature_rate_1: 0.05
+  drop_feature_rate_2: 0.1
+  tau: 0.5
+  tau_n: 0.5
+  tau_g: 0.5
+  tau_m: 1
+  w_g: 1
+  w_m: 0.18
+  n_epoch: 60
+  lr: 3.55e-04
+  weight_decay: 0.01
+  n_ratio : 0.45
+  e_ratio : 0.45
+  lr_lr: 0.0075
+  lr_num_epochs: 105
+  lambda_n: 0.0065
+  lambda_g: 0.00005
+  beta: 0.635
+  K: 1
+  d: 10
+  device: 1
+  batch_size: 512
+  batch_size_1: null
+  batch_size_2: null
+
+ModelNet40:
+  num_layers: 1
+  hid_dim: 512
+  proj_dim: 512
+  drop_incidence_rate_1: 0.05
+  drop_incidence_rate_2: 0.1
+  drop_feature_rate_1: 0.05
+  drop_feature_rate_2: 0.1
+  tau: 0.5
+  tau_n: 0.5
+  tau_g: 0.5
+  tau_m: 1
+  w_g: 1
+  w_m: 0.01
+  n_epoch: 50
+  lr: 3.5e-04
+  weight_decay: 0.18
+  n_ratio : 0.45
+  e_ratio : 0.45
+  lr_lr: 0.018
+  lr_num_epochs: 70
+  lambda_n: 0.0017
+  lambda_g: 0.025
+  beta: 0.5
+  K: 1
+  d: 10
+  device: 0
+  batch_size: 512
+  batch_size_1: null
+  batch_size_2: null
