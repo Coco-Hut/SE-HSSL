@@ -42,7 +42,7 @@ def linear_evaluation(z, labels, masks, lr=0.01, max_epoch=100,lr_weight=0.0):
 def node_classification_eval(model,data,num_splits=20,lr=0.005,max_epoch=100,lr_weight=0.0):
     
     model.eval()
-    z,_ = model(data.features, data.hyperedge_index) # z已经detach
+    z,_ = model(data.features, data.hyperedge_index) 
     
     accs = []
     for i in range(num_splits):

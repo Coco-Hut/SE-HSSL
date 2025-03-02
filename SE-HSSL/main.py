@@ -14,6 +14,7 @@ from tricl_encoder import HyperEncoder, TriCL
 from utils import fix_seed,drop_features, drop_incidence, valid_node_edge_mask, hyperedge_index_masking
 from utils import search_k_hop_edge,clique_expansion,save_samples,load_samples
 from evaluation import node_classification_eval
+from fairaug import orth_proj,balance_hyperedges
 
 class MILNCELoss(nn.Module):
   
@@ -51,13 +52,13 @@ class MILNCELoss(nn.Module):
                 node_idx=hop_hypernode[k][ids]
                 anchor=n[node_idx,:] 
                 
-                anchor=torch.repeat_interleave(anchor.unsqueeze(1),self.d,dim=1) # [batch_size,sample_size,node_dim]
+                anchor=torch.repeat_interleave(anchor.unsqueeze(1),self.d,dim=1)
                 
                 for j in range(k):
                     
                     contrast_edges_j=hop_hyperedge[k][ids,j]
                     contrast_obj=e[contrast_edges_j,:] # # [batch_size,sample_size,edge_dim]
-                    hop_score=self.f(torch.sigmoid(self.disc(anchor,contrast_obj).squeeze()),self.tau).sum(dim=1) # [batch_size]记录每个节点在j-hop的得分
+                    hop_score=self.f(torch.sigmoid(self.disc(anchor,contrast_obj).squeeze()),self.tau).sum(dim=1) 
                     
                     score_list[k][ids,j]=hop_score
                         
@@ -77,7 +78,7 @@ class MILNCELoss(nn.Module):
         
         return loss.mean() if self.mean else loss.sum()    
     
-def train(model,contrast_model,data,params,hop_hyperedge,hop_hypernode,optimizer,model_type,projection=True):
+def train(model,contrast_model,data,params,hop_hyperedge,hop_hypernode,optimizer,model_type,projection=False):
     
     features, hyperedge_index = data.features, data.hyperedge_index
     num_nodes, num_edges = data.num_nodes, data.num_edges
@@ -131,6 +132,67 @@ def train(model,contrast_model,data,params,hop_hyperedge,hop_hypernode,optimizer
     
     return loss
 
+# Fair variant
+def FairHSSL_Training(model,contrast_model,data,params,hop_hyperedge,hop_hypernode,optimizer,model_type,projection=False):
+    
+    params=model.params
+
+    features, hyperedge_index = data.x, data.hyperedge_index
+    orth_features = orth_proj(features,data.sens_idx) 
+    num_nodes, num_edges = data.num_nodes, data.num_hyperedges
+    
+    if hasattr(data,'sens_idx'):
+        node_groups = features[:,data.sens_idx] 
+        balanced_hyperedge_index = balance_hyperedges(hyperedge_index, node_groups, dname=args.dname) 
+        
+    for epoch in tqdm(range(1, params['n_epoch'] + 1)):
+    
+        model.train()
+        optimizer.zero_grad(set_to_none=True)
+        
+        if params['edge_aug'] == 'aos':
+            hyperedge_index1=drop_incidence(hyperedge_index, params['drop_incidence_rate_1'])
+            hyperedge_index2 = drop_incidence(balanced_hyperedge_index, params['drop_incidence_rate_2'])
+        else:
+            hyperedge_index1 = drop_incidence(hyperedge_index, params['drop_incidence_rate_1'])
+            hyperedge_index2 = drop_incidence(hyperedge_index, params['drop_incidence_rate_2'])
+        
+        # Feature Augmentation
+        if params['feat_aug'] == 'orth_proj':
+            x1 =  drop_features(features, params['drop_feature_rate_1']) 
+            x2 = drop_features(orth_features, params['drop_feature_rate_2'])
+        else:
+            x1 = drop_features(features, params['drop_feature_rate_1'])
+            x2 = drop_features(features, params['drop_feature_rate_2'])
+
+        node_mask1, edge_mask1 = valid_node_edge_mask(hyperedge_index1, num_nodes, num_edges)
+        node_mask2, edge_mask2 = valid_node_edge_mask(hyperedge_index2, num_nodes, num_edges)
+
+        # Encoder
+        n1, e1 = model(x1, hyperedge_index1, num_nodes, num_edges)
+        n2, e2 = model(x2, hyperedge_index2, num_nodes, num_edges)
+        n, e = model(features, hyperedge_index, num_nodes, num_edges)
+        
+        if model_type in ['hssl','hssl_ng','hssl_n']:
+            loss_n=cca_loss(n1,n2,num_nodes,params['lambda_n'],params['device'])
+        else:
+            loss_n=0
+        
+        if model_type in ['hssl','hssl_ng']:
+            loss_g=cca_loss(e1,e2,num_edges,params['lambda_g'],params['device'])
+        else:
+            loss_g=0
+        
+        if model_type in ['hssl']:
+            loss_m=contrast_model(n,e,hop_hyperedge,hop_hypernode)
+        else:
+            loss_m = 0
+        
+        loss = loss_n + params['w_g'] * loss_g + params['w_m'] * loss_m
+        
+        loss.backward()
+        optimizer.step()
+
 def generate_sample(data,params,save=True,seed=0):
     
     # clique expansion: node-node adjacency matrix
@@ -166,11 +228,12 @@ def generate_sample(data,params,save=True,seed=0):
 
 if __name__ == '__main__':
     
-    parser = argparse.ArgumentParser('TriCL unsupervised learning.')
+    parser = argparse.ArgumentParser('SE-HSSL unsupervised learning.')
     parser.add_argument('--dataset', type=str, default='cora', 
         choices=['cora', 'citeseer', 'pubmed', 'cora_coauthor', 'dblp_coauthor', 
                     'zoo', '20newsW100', 'Mushroom', 'NTU2012', 'ModelNet40'])
     parser.add_argument('--model_type', type=str, default='hssl', choices=['hssl'])
+    parser.add_argument('--is_fair',type=bool,default=False)
     parser.add_argument('--sample_seed', type=str, default=0, choices=['spcl'])
     parser.add_argument('--verbose_iter', type=int, default=50)
     parser.add_argument('--num_seeds', type=int, default=2)
@@ -198,9 +261,13 @@ if __name__ == '__main__':
         
         optimizer = torch.optim.AdamW(model.parameters(), lr=params['lr'], weight_decay=params['weight_decay'])
 
-        for epoch in tqdm(range(1, params['n_epoch'] + 1)):
-            loss = train(model,contrast_model,data,params,hop_hyperedge,hop_hypernode,optimizer,
-                        args.model_type,projection=False)
+        if args.is_fair:
+            FairHSSL_Training(model,contrast_model,data,params,hop_hyperedge,hop_hypernode,optimizer,
+                              args.model_type,projection=False)
+        else:
+            for epoch in tqdm(range(1, params['n_epoch'] + 1)):
+                loss = train(model,contrast_model,data,params,hop_hyperedge,hop_hypernode,optimizer,
+                            args.model_type,projection=False)
             
         acc = node_classification_eval(model,data,lr=params['lr_lr'],max_epoch=params['lr_num_epochs'],
                                        lr_weight=params['lr_wd'])

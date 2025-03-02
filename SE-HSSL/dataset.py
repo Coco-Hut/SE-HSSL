@@ -46,7 +46,6 @@ class BaseDataset(object):
         edge_to_num = {}
         num_to_edge = {}
         num = 0
-        # 建立超边和index_num的对应
         for edge in edge_set:
             edge_to_num[edge] = num
             num_to_edge[num] = edge
