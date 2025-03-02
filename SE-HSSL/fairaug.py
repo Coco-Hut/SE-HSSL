@@ -47,7 +47,7 @@ def balance_hyperedges(hyperedge_index, node_groups, beta=1,
     else:
         edge_dict = {}  
         for node, edge in hyperedge_index.T:
-            edge_dict.setdefault(edge.item(), []).append(node.item()) # key为超边,维护一个list表示超节点
+            edge_dict.setdefault(edge.item(), []).append(node.item()) 
 
         node_group_0 = [i for i, x in enumerate(node_groups) if x == 0]
         node_group_1 = [i for i, x in enumerate(node_groups) if x == 1]
